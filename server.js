@@ -1,25 +1,15 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import https from "https";
 import connectDB from "./config/db.js";
 import taskRoutes from "./routes/taskRoutes.js";
-import https from "https";
-
 
 dotenv.config();
 const app = express();
 
 connectDB();
 
-setInterval(() => {
-  https.get("https://taskverse-lggn.onrender.com/", (res) => {
-    console.log(`Keep alive ping: ${res.statusCode}`);
-  }).on("error", (err) => {
-    console.error("Keep alive error:", err.message);
-  });
-}, 14 * 60 * 1000); // every 14 minutes
-
-// ✅ CORS must be before everything else
 app.use(cors());
 app.use(express.json());
 
@@ -32,4 +22,15 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+
+  // ✅ Keep alive — pings every 14 mins so Render never sleeps
+  setInterval(() => {
+    https.get("https://taskverse-lggn.onrender.com/", (res) => {
+      console.log(`Keep alive: ${res.statusCode}`);
+    }).on("error", (err) => {
+      console.error("Keep alive error:", err.message);
+    });
+  }, 14 * 60 * 1000);
+});
