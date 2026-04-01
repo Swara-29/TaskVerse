@@ -14,6 +14,5 @@ router.get("/", getTasks);
 router.post("/", createTask);
 router.put("/:id", updateTask);
 router.delete("/:id", deleteTask);
-router.patch("/toggle/:id", toggleTaskCompletion); // Toggle completion
-
+router.patch("/:id/toggle", toggleTaskCompletion);
 export default router;
